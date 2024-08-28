@@ -1,77 +1,95 @@
-#include <iostream>
-#include <string>
-#include <vector>
 
+#include <bits/stdc++.h>
 using namespace std;
 
-string encryptRailFence(const string& text, int key) {
-    vector<string> rail(key);
-    int direction = 1; 
-    int row = 0;
+string encryptRailFence(string text, int key)
+{
+	char rail[key][(text.length())];
 
-    for (char ch : text) {
-        rail[row] += ch;
-        row += direction;
-        if (row == 0 || row == key - 1) {
-            direction *= -1;
-        }
-    }
+	for (int i=0; i < key; i++)
+		for (int j = 0; j < text.length(); j++)
+			rail[i][j] = '\n';
 
-    string cipherText;
-    for (const string& r : rail) {
-        cipherText += r;
-    }
-    return cipherText;
+	bool dir_down = false;
+	int row = 0, col = 0;
+
+	for (int i=0; i < text.length(); i++)
+	{
+
+		if (row == 0 || row == key-1)
+			dir_down = !dir_down;
+
+		rail[row][col++] = text[i];
+
+		dir_down?row++ : row--;
+	}
+
+	string result;
+	for (int i=0; i < key; i++)
+		for (int j=0; j < text.length(); j++)
+			if (rail[i][j]!='\n')
+				result.push_back(rail[i][j]);
+
+	return result;
 }
 
-string decryptRailFence(const string& cipherText, int key) {
-    vector<string> rail(key);
-    vector<vector<bool>> pattern(key, vector<bool>(cipherText.length(), false));
-    int direction = 1; 
-    int row = 0;
+string decryptRailFence(string cipher, int key)
+{
+	char rail[key][cipher.length()];
 
-    for (int i = 0; i < cipherText.length(); i++) {
-        pattern[row][i] = true;
-        row += direction;
-        if (row == 0 || row == key - 1) {
-            direction *= -1;
-        }
-    }
+	for (int i=0; i < key; i++)
+		for (int j=0; j < cipher.length(); j++)
+			rail[i][j] = '\n';
 
-    int index = 0;
-    for (int r = 0; r < key; r++) {
-        for (int c = 0; c < cipherText.length(); c++) {
-            if (pattern[r][c] && index < cipherText.length()) {
-                rail[r] += cipherText[index++];
-            }
-        }
-    }
+	bool dir_down;
 
-    string decryptedText;
-    row = 0;
-    direction = 1;
-    for (int i = 0; i < cipherText.length(); i++) {
-        decryptedText += rail[row][0];
-        rail[row].erase(0, 1);
-        row += direction;
-        if (row == 0 || row == key - 1) {
-            direction *= -1;
-        }
-    }
+	int row = 0, col = 0;
 
-    return decryptedText;
+	for (int i=0; i < cipher.length(); i++)
+	{
+		if (row == 0)
+			dir_down = true;
+		if (row == key-1)
+			dir_down = false;
+
+		rail[row][col++] = '*';
+
+		dir_down?row++ : row--;
+	}
+	int index = 0;
+	for (int i=0; i<key; i++)
+		for (int j=0; j<cipher.length(); j++)
+			if (rail[i][j] == '*' && index<cipher.length())
+				rail[i][j] = cipher[index++];
+
+
+	string result;
+
+	row = 0, col = 0;
+	for (int i=0; i< cipher.length(); i++)
+	{
+		if (row == 0)
+			dir_down = true;
+		if (row == key-1)
+			dir_down = false;
+
+		if (rail[row][col] != '*')
+			result.push_back(rail[row][col++]);
+
+		dir_down?row++: row--;
+	}
+	return result;
 }
+int main()
+{
+	cout << encryptRailFence("attack at once", 2) << endl;
+	cout << encryptRailFence("GeeksforGeeks ", 3) << endl;
+	cout << encryptRailFence("defend the east wall", 3) << endl;
 
-int main() {
-    string plaintext = "RAIL_FENCE";
-    int key = 3;
+	//Now decryption of the same cipher-text
+	cout << decryptRailFence("GsGsekfrek eoe",3) << endl;
+	cout << decryptRailFence("atc toctaka ne",2) << endl;
+	cout << decryptRailFence("dnhaweedtees alf tl",3) << endl;
 
-    string ciphertext = encryptRailFence(plaintext, key);
-    string decryptedText = decryptRailFence(ciphertext, key);
-
-    cout << "Plaintext: " << plaintext << endl;
-    cout << "Ciphertext: " << ciphertext << endl;
-    cout << "Decrypted Text: " << decryptedText << endl;
-
-    return 0;
+	return 0;
 }
