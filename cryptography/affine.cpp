@@ -1,43 +1,59 @@
-#include <iostream>
-#include <string>
 
+#include<bits/stdc++.h>
 using namespace std;
 
-const int a = 5; 
-const int b = 8; 
-const int m = 26; 
+const int a = 17;
+const int b = 20;
 
-char encryptChar(char ch) {
-    if (ch >= 'A' && ch <= 'Z') {
-        return char(((a * (ch - 'A') + b) % m) + 'A');
-    }
-    return ch;
+string encryptMessage(string msg)
+{
+	string cipher = ""; 
+	for (int i = 0; i < msg.length(); i++)
+	{
+		if(msg[i]!=' ') 
+			cipher = cipher + 
+						(char) ((((a * (msg[i]-'A') ) + b) % 26) + 'A');
+		else
+			cipher += msg[i];	 
+	}
+	return cipher;
 }
 
-char decryptChar(char ch) {
-    if (ch >= 'A' && ch <= 'Z') {
-        int a_inv = 21; 
-        return char(((a_inv * (ch - 'A' - b + m)) % m + m) % m + 'A');
-    }
-    return ch;
+string decryptCipher(string cipher)
+{
+	string msg = "";
+	int a_inv = 0;
+	int flag = 0;
+	
+	for (int i = 0; i < 26; i++)
+	{
+		flag = (a * i) % 26;
+		
+		if (flag == 1)
+		{ 
+			a_inv = i;
+		}
+	}
+	for (int i = 0; i < cipher.length(); i++)
+	{
+		if(cipher[i]!=' ')
+			msg = msg + 
+					(char) (((a_inv * ((cipher[i]+'A' - b)) % 26)) + 'A');
+		else
+			msg += cipher[i]; 
+	}
+
+	return msg;
 }
 
-int main() {
-    string plaintext = "AFFINECIPHER";
-    string ciphertext = "";
-    string decryptedText = "";
+int main(void)
+{
+	string msg = "AFFINE CIPHER";
+	
+	string cipherText = encryptMessage(msg);
+	cout << "Encrypted Message is : " << cipherText<<endl;
+	
+	cout << "Decrypted Message is: " << decryptCipher(cipherText);
 
-    for (char ch : plaintext) {
-        ciphertext += encryptChar(ch);
-    }
-
-    for (char ch : ciphertext) {
-        decryptedText += decryptChar(ch);
-    }
-
-    cout << "Plaintext: " << plaintext << endl;
-    cout << "Ciphertext: " << ciphertext << endl;
-    cout << "Decrypted Text: " << decryptedText << endl;
-
-    return 0;
+	return 0;
 }
